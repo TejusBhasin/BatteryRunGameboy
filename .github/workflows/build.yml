@@ -1,0 +1,28 @@
+name: Build OG Game Boy ROM
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download GBDK-2020
+        run: |
+          curl -L -o gbdk.tar.gz https://github.com/gbdk-2020/gbdk-2020/releases/download/4.5.0/gbdk-linux64.tar.gz
+          mkdir -p gbdk
+          tar -xzf gbdk.tar.gz -C gbdk --strip-components=1
+
+      - name: Build ROM
+        run: |
+          export GBDK_HOME="$PWD/gbdk"
+          make
+
+      - name: Upload Game Boy ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: battery-run-og-gameboy-rom
+          path: build/battery_run.gb
